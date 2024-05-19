@@ -1,0 +1,119 @@
+********Problem Statement*********
+********Task Scheduler*********
+
+You are given an array of CPU tasks, each represented by letters A to Z, and a cooling time, n. Each cycle or interval allows the completion of one task. Tasks can be completed in any order, but there's a constraint: identical tasks must be separated by at least n intervals due to cooling time.
+
+​Return the minimum number of intervals required to complete all tasks.
+
+ 
+
+Example 1:
+
+Input: tasks = ["A","A","A","B","B","B"], n = 2
+
+Output: 8
+
+Explanation: A possible sequence is: A -> B -> idle -> A -> B -> idle -> A -> B.
+
+After completing task A, you must wait two cycles before doing A again. The same applies to task B. In the 3rd interval, neither A nor B can be done, so you idle. By the 4th cycle, you can do A again as 2 intervals have passed.
+
+Example 2:
+
+Input: tasks = ["A","C","A","B","D","B"], n = 1
+
+Output: 6
+
+Explanation: A possible sequence is: A -> B -> C -> D -> A -> B.
+
+With a cooling interval of 1, you can repeat a task after just one other task.
+
+Example 3:
+
+Input: tasks = ["A","A","A", "B","B","B"], n = 3
+
+Output: 10
+
+Explanation: A possible sequence is: A -> B -> idle -> idle -> A -> B -> idle -> idle -> A -> B.
+
+There are only two types of tasks, A and B, which need to be separated by 3 intervals. This leads to idling twice between repetitions of these tasks.
+
+ 
+
+Constraints:
+
+1 <= tasks.length <= 104
+tasks[i] is an uppercase English letter.
+0 <= n <= 100
+
+*******Code*******
+
+class Solution {
+    public int leastInterval(char[] tasks, int n) {
+        //Approach 1 using Heap TC:(n) SC:O(26)
+
+        // int map[] = new int[27];// map will store max 26 character so SC O(26)
+        // //suppose tasks length is n TC for this for loop is O(n)
+        // for(char ch: tasks){
+        //     map[ch - 'A']++;
+        // }
+
+        // // pq will store max 26 character so SC O(26)
+        // PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> b - a);
+        // int time = 0;
+
+        // for(int i = 0; i < 26; i++){//TC:O(26)
+        //     if(map[i] > 0){
+        //         pq.add(map[i]);// add method take O(26) time bcs only 26 time it will runnning in max
+        //     }
+        // }
+        // //here overall time is O(26)
+        // while(!pq.isEmpty()){
+        //     ArrayList<Integer> temp = new ArrayList<>();
+        //     for(int i = 1; i <= n+1; i++){
+        //         if(!pq.isEmpty()){
+        //             int freq = pq.remove();
+        //             freq--;
+        //             temp.add(freq);
+        //         }
+        //     }
+
+        //     for(int frequency: temp){
+        //         if(frequency > 0){
+        //             pq.add(frequency);
+        //         }
+        //     }
+
+        //     if(pq.isEmpty()){
+        //         time += temp.size();
+        //     }else{
+        //         time += n + 1;
+        //     }
+        // }
+
+        // return time;
+
+         //Approach 2 using Greedy TC:(n) SC:O(26)
+
+         int[] map = new int[26];//SC:O(26)
+
+         for(char ch: tasks){//for loop time is O(n)
+            map[ch - 'A']++;
+         }
+
+        Arrays.sort(map);
+
+        int maxFreq = map[25];
+        int gaddhe = maxFreq - 1;
+        int idleSlots = n * gaddhe;
+
+        for(int i = 24; i >= 0; i--){//TC:O(25)
+            idleSlots -= Math.min(map[i], gaddhe);
+        }
+
+        if(idleSlots > 0){
+            return tasks.length + idleSlots;
+        }
+
+        return tasks.length;
+    }
+}
