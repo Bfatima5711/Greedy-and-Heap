@@ -1,0 +1,109 @@
+******Problem Statement******
+******Hand of Straights*******
+
+Alice has some number of cards and she wants to rearrange the cards into groups so that each group is of size groupSize, and consists of groupSize consecutive cards.
+
+Given an integer array hand where hand[i] is the value written on the ith card and an integer groupSize, return true if she can rearrange the cards, or false otherwise.
+
+ 
+
+Example 1:
+
+Input: hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
+Output: true
+Explanation: Alice's hand can be rearranged as [1,2,3],[2,3,4],[6,7,8]
+Example 2:
+
+Input: hand = [1,2,3,4,5], groupSize = 4
+Output: false
+Explanation: Alice's hand can not be rearranged into groups of 4.
+
+ 
+
+Constraints:
+
+1 <= hand.length <= 104
+0 <= hand[i] <= 109
+1 <= groupSize <= hand.length
+
+*****Code******
+
+class Cards{
+    int card;
+    int freq;
+
+    Cards(int card_, int freq_){
+        this.card = card_;
+        this.freq = freq_;
+    }
+}
+class Solution {
+    public boolean isNStraightHand(int[] hand, int groupSize) {
+        //Approach 1: TC:O(nlogn) SC:O(n)
+        int n = hand.length;
+        if(n % groupSize != 0) return false;
+        if(groupSize == 1) return true;
+
+        HashMap<Integer, Integer> map = new HashMap<>();//SC o(n)
+
+        for(int it: hand){//O(n) time
+            map.put(it, map.getOrDefault(it, 0) + 1);// put mthod take O(1)
+        }
+
+        PriorityQueue<Cards> min_heap = new PriorityQueue<>((a, b) -> a.card - b.card);//O(n)
+
+        for(int key: map.keySet()){//o(n) time
+            min_heap.add(new Cards(key, map.get(key)));//pq add method will take log(n)
+        }
+
+        while(!min_heap.isEmpty()){//O(nlogn) time
+            Cards it = min_heap.remove();
+            it.freq--;
+
+            ArrayList<Cards> temp_list = new ArrayList<>();
+
+            for(int i = 1; i < groupSize; i++){
+                if(!min_heap.isEmpty() && it.card+i == min_heap.peek().card){
+                    Cards curr = min_heap.remove();
+                    curr.freq--;
+                    if(curr.freq >= 1){
+                        temp_list.add(new Cards(curr.card, curr.freq));
+                    }
+                }else{
+                    return false;
+                }
+            }
+
+            while(!temp_list.isEmpty()){
+                min_heap.add(temp_list.remove(temp_list.size()-1));
+            }
+
+            if(it.freq >= 1) {
+                min_heap.add(new Cards(it.card, it.freq));
+            }
+        }
+        return true;
+
+        //Approach 2: TC:O(nlogn) SC:O(n)
+        int n = hand.length;
+        if(n % groupSize != 0) return false;
+        if(groupSize == 1) return true;
+
+        PriorityQueue<Integer> min_heap = new PriorityQueue<>();//O(n)
+
+        for(int it: hand){
+            min_heap.add(it);
+        }
+
+        while(!min_heap.isEmpty()){
+            int min_value = min_heap.remove();
+
+            for(int i = 1; i < groupSize; i++){
+                if(!min_heap.remove(min_value+i)) return false;
+            }
+        }
+
+        return true;
+
+    }
+}
