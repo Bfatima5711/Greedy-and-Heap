@@ -1,0 +1,105 @@
+******Problem Statement******
+******Valid Parenthesis String******
+
+Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.
+
+The following rules define a valid string:
+
+Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+Any right parenthesis ')' must have a corresponding left parenthesis '('.
+Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+ 
+
+Example 1:
+
+Input: s = "()"
+Output: true
+Example 2:
+
+Input: s = "(*)"
+Output: true
+Example 3:
+
+Input: s = "(*))"
+Output: true
+ 
+
+Constraints:
+
+1 <= s.length <= 100
+s[i] is '(', ')' or '*'.
+
+
+******Code*******
+
+class Solution {
+    // Approach 1: TC: O(3^n) which is exponential for recursion  SC:O(n)
+    // public boolean isValid(int idx, int open, String s, int n){
+    //     if(idx == n){
+    //         return open == 0;
+    //     }
+
+    //     boolean valid = false;
+
+    //     if(s.charAt(idx) == '*'){
+    //         valid |= isValid(idx+1, open+1, s, n);// case for '('
+    //         valid |= isValid(idx+1, open, s, n);// case for 'space'
+
+    //         if(open > 0){
+    //             valid |= isValid(idx+1, open-1, s, n);// case for '('
+    //         }
+    //     }else if(s.charAt(idx) == '('){
+    //         valid |= isValid(idx+1, open+1, s, n);// case for '('
+    //     }else if(open > 0){
+    //         valid |= isValid(idx+1, open-1, s, n);// case for '('
+    //     }
+
+    //     return valid;
+    // }
+
+    // Approach 2: TC: O(n * n)  SC:O(n * n)
+    public boolean isValid(int idx, int open, String s, int n, int[][] dp){
+        if(idx == n){
+            return open == 0;
+        }
+
+        boolean valid = false;
+
+        if(dp[idx][open] != -1){
+            return dp[idx][open] == 0 ? true : false;
+        }
+
+        if(s.charAt(idx) == '*'){
+            valid |= isValid(idx+1, open+1, s, n, dp);// case for '('
+            valid |= isValid(idx+1, open, s, n, dp);// case for 'space'
+
+            if(open > 0){
+                valid |= isValid(idx+1, open-1, s, n, dp);// case for '('
+            }
+        }else if(s.charAt(idx) == '('){
+            valid |= isValid(idx+1, open+1, s, n, dp);// case for '('
+        }else if(open > 0){
+            valid |= isValid(idx+1, open-1, s, n, dp);// case for '('
+        }
+
+        if(valid){
+            dp[idx][open] = 0;
+        }else{
+            dp[idx][open] = 1;
+        }
+
+        return valid;
+    }
+    public boolean checkValidString(String s) {
+        int n = s.length();
+
+        int dp[][] = new int[n+1][n+1];
+
+        for(int i = 0; i < n+1; i++){
+            Arrays.fill(dp[i], -1);
+        }
+
+        return isValid(0, 0, s, n, dp);
+    }
+}
